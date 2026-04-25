@@ -10,6 +10,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const { from } = await searchParams;
   const redirectTo = from && from.startsWith("/") ? from : "/";
 
+  const today = new Intl.DateTimeFormat("es-CL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+    .format(new Date())
+    .toUpperCase();
+
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
@@ -49,7 +57,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             disabled
             aria-disabled="true"
             title="Disponible próximamente"
-            className="flex w-full max-w-[220px] cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-border/30 bg-muted py-3 opacity-60 transition-colors"
+            className="flex w-full max-w-55 cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-border/30 bg-muted py-3 opacity-60 transition-colors"
           >
             <svg className="size-5" viewBox="0 0 24 24" aria-hidden="true">
               <path
@@ -81,7 +89,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <Leaf className="size-5" />
         </div>
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">
-          EST. MMXXIV
+          {today}
         </p>
       </div>
     </main>
