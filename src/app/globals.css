@@ -8,8 +8,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-heading);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +39,41 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Brota brand scales — exposed as Tailwind utilities (bg-primary-50, text-secondary-700, etc.) */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+
+  --color-secondary-50: var(--secondary-50);
+  --color-secondary-100: var(--secondary-100);
+  --color-secondary-200: var(--secondary-200);
+  --color-secondary-300: var(--secondary-300);
+  --color-secondary-400: var(--secondary-400);
+  --color-secondary-500: var(--secondary-500);
+  --color-secondary-600: var(--secondary-600);
+  --color-secondary-700: var(--secondary-700);
+  --color-secondary-800: var(--secondary-800);
+  --color-secondary-900: var(--secondary-900);
+
+  --color-accent-50: var(--accent-50);
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+  --color-accent-800: var(--accent-800);
+  --color-accent-900: var(--accent-900);
+
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -48,73 +83,95 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ----------------------------------------------------------------
+   Brota — light theme tokens
+   Palette anchors:
+     Primary    #1B3022  forest green
+     Secondary  #A8B5A2  sage
+     Tertiary   #D67D5C  terracotta  (mapped to --accent)
+     Neutral    #FDFCF8  warm off-white  (mapped to --background)
+   ---------------------------------------------------------------- */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Surfaces */
+  --background: oklch(0.987 0.005 95);
+  --foreground: oklch(0.22 0.025 150);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.22 0.025 150);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
+  --popover-foreground: oklch(0.22 0.025 150);
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Primary — forest green #1B3022 */
+  --primary: oklch(0.275 0.04 152);
+  --primary-foreground: oklch(0.987 0.005 95);
+  --primary-50:  oklch(0.96 0.012 150);
+  --primary-100: oklch(0.92 0.022 150);
+  --primary-200: oklch(0.84 0.032 150);
+  --primary-300: oklch(0.74 0.04 150);
+  --primary-400: oklch(0.6 0.045 150);
+  --primary-500: oklch(0.45 0.045 150);
+  --primary-600: oklch(0.36 0.04 152);
+  --primary-700: oklch(0.275 0.04 152);
+  --primary-800: oklch(0.21 0.035 152);
+  --primary-900: oklch(0.15 0.025 152);
+
+  /* Secondary — sage #A8B5A2 */
+  --secondary: oklch(0.74 0.025 140);
+  --secondary-foreground: oklch(0.22 0.025 150);
+  --secondary-50:  oklch(0.97 0.008 140);
+  --secondary-100: oklch(0.93 0.014 140);
+  --secondary-200: oklch(0.86 0.022 140);
+  --secondary-300: oklch(0.79 0.025 140);
+  --secondary-400: oklch(0.74 0.025 140);
+  --secondary-500: oklch(0.65 0.028 142);
+  --secondary-600: oklch(0.55 0.03 142);
+  --secondary-700: oklch(0.45 0.03 142);
+  --secondary-800: oklch(0.35 0.028 142);
+  --secondary-900: oklch(0.25 0.025 142);
+
+  /* Accent (Tertiary in design system) — terracotta #D67D5C */
+  --accent: oklch(0.7 0.13 42);
+  --accent-foreground: oklch(0.99 0 0);
+  --accent-50:  oklch(0.97 0.018 42);
+  --accent-100: oklch(0.93 0.04 42);
+  --accent-200: oklch(0.87 0.07 42);
+  --accent-300: oklch(0.8 0.1 42);
+  --accent-400: oklch(0.74 0.12 42);
+  --accent-500: oklch(0.7 0.13 42);
+  --accent-600: oklch(0.6 0.135 38);
+  --accent-700: oklch(0.5 0.13 35);
+  --accent-800: oklch(0.4 0.11 32);
+  --accent-900: oklch(0.3 0.085 30);
+
+  /* Muted = subtle sage tint, ideal for empty states / placeholders */
+  --muted: oklch(0.95 0.008 140);
+  --muted-foreground: oklch(0.5 0.02 150);
+
+  /* Destructive — warm red consistent with the trash icon in the mockup */
+  --destructive: oklch(0.55 0.18 25);
+
+  /* Borders, inputs, focus ring */
+  --border: oklch(0.9 0.012 140);
+  --input: oklch(0.92 0.01 140);
+  --ring: oklch(0.55 0.06 152);
+
+  /* Charts — derived from the palette for consistency */
+  --chart-1: var(--primary-700);
+  --chart-2: var(--secondary-500);
+  --chart-3: var(--accent-500);
+  --chart-4: var(--primary-400);
+  --chart-5: var(--accent-700);
+
+  --radius: 0.75rem;
+
+  /* Sidebar mirrors the surface palette */
+  --sidebar: oklch(0.97 0.008 140);
+  --sidebar-foreground: oklch(0.22 0.025 150);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
 }
 
 @layer base {
@@ -122,9 +179,9 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
-  html {
-    @apply font-sans;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
   }
 }
