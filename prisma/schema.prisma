@@ -1,0 +1,198 @@
+// Brota — Prisma schema
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------- Enums ----------
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum LightRequirement {
+  LOW
+  MEDIUM_INDIRECT
+  BRIGHT_INDIRECT
+  DIRECT
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum GrowthRate {
+  FAST
+  MEDIUM
+  SLOW
+}
+
+enum WateringAmount {
+  LIGHT
+  NORMAL
+  HEAVY
+}
+
+enum HealthStatus {
+  HEALTHY
+  ATTENTION
+  CRITICAL
+}
+
+enum ReminderType {
+  WATERING
+  FERTILIZING
+  CHECK
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  ACKNOWLEDGED
+  DISMISSED
+}
+
+// ---------- Models ----------
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+
+  wateringEvents WateringEvent[]
+}
+
+model Species {
+  id                      String           @id @default(cuid())
+  commonName              String
+  scientificName          String?
+  family                  String?
+  description             String?
+  lightRequirement        LightRequirement
+  wateringFrequencyDays   Int
+  wateringFrequencyMin    Int
+  wateringFrequencyMax    Int
+  idealTempMinC           Float?
+  idealTempMaxC           Float?
+  criticalTempMinC        Float?
+  criticalTempMaxC        Float?
+  humidityIdealMin        Int?
+  humidityIdealMax        Int?
+  substrateType           String?
+  phIdeal                 Float?
+  fertilizationFrequency  String?
+  fertilizationType       String?
+  specialCare             Json?
+  commonProblems          Json?
+  difficulty              Difficulty       @default(MEDIUM)
+  growthRate              GrowthRate       @default(MEDIUM)
+  activeSeasons           Json?
+  generatedByAi           Boolean          @default(false)
+  aiModel                 String?
+  aiGeneratedAt           DateTime?
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+
+  plants Plant[]
+
+  @@index([commonName])
+  @@index([scientificName])
+}
+
+model Plant {
+  id                 String    @id @default(cuid())
+  nickname           String
+  speciesId          String
+  species            Species   @relation(fields: [speciesId], references: [id])
+  photoUrl           String?
+  location           String?
+  customWateringDays Int?
+  acquiredAt         DateTime?
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+
+  wateringEvents WateringEvent[]
+  diagnoses      Diagnosis[]
+  reminders      Reminder[]
+  sensorReadings SensorReading[]
+
+  @@index([speciesId])
+  @@index([deletedAt])
+}
+
+model WateringEvent {
+  id           String          @id @default(cuid())
+  plantId      String
+  plant        Plant           @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  wateredAt    DateTime
+  amount       WateringAmount?
+  notes        String?
+  registeredBy String
+  user         User            @relation(fields: [registeredBy], references: [id])
+  createdAt    DateTime        @default(now())
+
+  @@index([plantId, wateredAt])
+}
+
+model Diagnosis {
+  id                 String       @id @default(cuid())
+  plantId            String
+  plant              Plant        @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  photoUrl           String
+  reportedSymptoms   String?
+  aiModel            String
+  aiResponse         Json
+  healthStatus       HealthStatus
+  detectedIssues     Json?
+  probableCauses     Json?
+  recommendedActions Json?
+  reviewNextDate     DateTime?
+  createdAt          DateTime     @default(now())
+
+  @@index([plantId, createdAt])
+}
+
+model Reminder {
+  id             String         @id @default(cuid())
+  plantId        String
+  plant          Plant          @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  type           ReminderType
+  scheduledFor   DateTime
+  sentAt         DateTime?
+  acknowledgedAt DateTime?
+  status         ReminderStatus @default(PENDING)
+  createdAt      DateTime       @default(now())
+
+  @@index([scheduledFor, status])
+  @@index([plantId])
+}
+
+// Phase 2 — sensor support, kept ready but not used in MVP
+model SensorReading {
+  id              String   @id @default(cuid())
+  plantId         String
+  plant           Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  sensorId        String
+  readAt          DateTime
+  soilMoisture    Float?
+  ambientTemp     Float?
+  ambientHumidity Float?
+  lightLevel      Float?
+  batteryVoltage  Float?
+
+  @@index([plantId, readAt])
+  @@index([sensorId, readAt])
+}

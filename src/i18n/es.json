@@ -1,0 +1,16 @@
+{
+  "app": {
+    "name": "Brota",
+    "tagline": "Cuida, observa, brota"
+  },
+  "nav": {
+    "home": "Inicio",
+    "plants": "Mis plantas",
+    "diagnose": "Diagnosticar",
+    "settings": "Ajustes"
+  },
+  "auth": {
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión"
+  }
+}
