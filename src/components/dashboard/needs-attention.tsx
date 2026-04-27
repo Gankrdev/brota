@@ -1,18 +1,16 @@
 import Image from "next/image";
 import { Sprout, Droplet } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import type { NeedsAttentionPlant } from "@/lib/dashboard/queries";
 
 function badgeFor(daysOverdue: number) {
-  if (daysOverdue >= 3) return { label: "MUY SECA", variant: "danger" as const };
-  if (daysOverdue >= 1) return { label: "SEDIENTA", variant: "warning" as const };
-  return { label: "REGAR HOY", variant: "neutral" as const };
+  if (daysOverdue >= 3)
+    return { label: "MUY SECA", variant: "destructive" as const };
+  if (daysOverdue >= 1) return { label: "SEDIENTA", variant: "default" as const };
+  return { label: "REGAR HOY", variant: "secondary" as const };
 }
-
-const BADGE_STYLES: Record<"danger" | "warning" | "neutral", string> = {
-  danger: "bg-destructive text-white",
-  warning: "bg-accent text-accent-foreground",
-  neutral: "bg-muted text-foreground",
-};
 
 interface Props {
   plants: NeedsAttentionPlant[];
@@ -21,13 +19,14 @@ interface Props {
 export function NeedsAttention({ plants }: Props) {
   if (plants.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card p-12 text-center">
+      <Card className="items-center gap-3 border-dashed p-12 text-center ring-0 [&>img:first-child]:rounded-none">
         <Sprout className="size-10 text-secondary" />
         <p className="font-heading text-xl text-primary">Todo en orden</p>
         <p className="max-w-sm text-sm text-muted-foreground">
-          Ninguna planta necesita atención hoy. Cuando agregues plantas y registres riegos, las que se atrasen aparecerán aquí.
+          Ninguna planta necesita atención hoy. Cuando agregues plantas y registres
+          riegos, las que se atrasen aparecerán aquí.
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -36,10 +35,7 @@ export function NeedsAttention({ plants }: Props) {
       {plants.map((plant) => {
         const badge = badgeFor(plant.daysOverdue);
         return (
-          <article
-            key={plant.id}
-            className="flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
-          >
+          <Card key={plant.id} className="gap-0 py-0">
             <div className="relative h-48 w-full bg-muted">
               {plant.photoUrl ? (
                 <Image
@@ -54,29 +50,27 @@ export function NeedsAttention({ plants }: Props) {
                   <Sprout className="size-12" />
                 </div>
               )}
-              <span
-                className={`absolute right-2 top-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-widest ${BADGE_STYLES[badge.variant]}`}
+              <Badge
+                variant={badge.variant}
+                className="absolute top-2 right-2 tracking-widest uppercase"
               >
                 {badge.label}
-              </span>
+              </Badge>
             </div>
-            <div className="flex flex-grow flex-col gap-2 p-4">
+            <CardContent className="flex grow flex-col gap-3 p-4">
               <div>
                 <h3 className="text-lg font-bold text-primary">{plant.nickname}</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
                   {plant.location ?? plant.speciesCommonName}
                 </p>
               </div>
-              <div className="flex-grow" />
-              <button
-                type="button"
-                className="flex w-full items-center justify-center gap-1 rounded-md bg-accent py-2 text-sm font-semibold text-accent-foreground transition-opacity hover:opacity-90"
-              >
+              <div className="grow" />
+              <Button variant="default" className="w-full">
                 <Droplet className="size-4 fill-current" />
                 Regar ahora
-              </button>
-            </div>
-          </article>
+              </Button>
+            </CardContent>
+          </Card>
         );
       })}
     </div>

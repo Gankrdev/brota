@@ -42,6 +42,13 @@ enum WateringAmount {
   HEAVY
 }
 
+enum CareType {
+  WATERING
+  FERTILIZING
+  PRUNING
+  OTHER
+}
+
 enum HealthStatus {
   HEALTHY
   ATTENTION
@@ -72,7 +79,7 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  wateringEvents WateringEvent[]
+  careEvents CareEvent[]
 }
 
 model Species {
@@ -126,7 +133,7 @@ model Plant {
   updatedAt          DateTime  @updatedAt
   deletedAt          DateTime?
 
-  wateringEvents WateringEvent[]
+  careEvents     CareEvent[]
   diagnoses      Diagnosis[]
   reminders      Reminder[]
   sensorReadings SensorReading[]
@@ -135,18 +142,20 @@ model Plant {
   @@index([deletedAt])
 }
 
-model WateringEvent {
+model CareEvent {
   id           String          @id @default(cuid())
   plantId      String
   plant        Plant           @relation(fields: [plantId], references: [id], onDelete: Cascade)
-  wateredAt    DateTime
+  type         CareType
+  occurredAt   DateTime
   amount       WateringAmount?
   notes        String?
   registeredBy String
   user         User            @relation(fields: [registeredBy], references: [id])
   createdAt    DateTime        @default(now())
 
-  @@index([plantId, wateredAt])
+  @@index([plantId, occurredAt])
+  @@index([type, occurredAt])
 }
 
 model Diagnosis {

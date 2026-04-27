@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Droplet, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface QuickActionsProps {
   hasOverduePlants: boolean;
@@ -29,22 +30,21 @@ export function QuickActions({ hasOverduePlants }: QuickActionsProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap gap-4">
-        <button
-          type="button"
+        <Button
+          size="lg"
           onClick={waterAllDue}
           disabled={!hasOverduePlants || pending}
-          className="flex items-center gap-2 rounded-md bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-12 px-6 text-base"
         >
           <Droplet className="size-5 fill-current" />
           {pending ? "Registrando..." : "Regar todas las pendientes"}
-        </button>
-        <Link
-          href="/plants/new"
-          className="flex items-center gap-2 rounded-md bg-secondary px-6 py-4 text-base font-semibold text-secondary-foreground shadow-sm transition-opacity hover:opacity-90"
-        >
-          <Plus className="size-5" />
-          Agregar planta
-        </Link>
+        </Button>
+        <Button asChild variant="secondary" size="lg" className="h-12 px-6 text-base">
+          <Link href="/plants/new">
+            <Plus className="size-5" />
+            Agregar planta
+          </Link>
+        </Button>
       </div>
       {error && (
         <p role="alert" className="text-sm text-destructive">

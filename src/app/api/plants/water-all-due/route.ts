@@ -14,15 +14,16 @@ export async function POST() {
     return NextResponse.json({ watered: 0 });
   }
 
-  const wateredAt = new Date();
+  const occurredAt = new Date();
   const userId = session.user.id;
 
   const result = await prisma.$transaction(
     overdue.map((p) =>
-      prisma.wateringEvent.create({
+      prisma.careEvent.create({
         data: {
           plantId: p.id,
-          wateredAt,
+          type: "WATERING",
+          occurredAt,
           amount: "NORMAL",
           registeredBy: userId,
         },
