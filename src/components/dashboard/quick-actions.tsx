@@ -40,7 +40,7 @@ export function QuickActions({ hasOverduePlants }: QuickActionsProps) {
           {pending ? "Registrando..." : "Regar todas las pendientes"}
         </Button>
         <Button asChild variant="secondary" size="lg" className="h-12 px-6 text-base">
-          <Link href="/plants/new">
+          <Link href="/jardin/nueva">
             <Plus className="size-5" />
             Agregar planta
           </Link>

@@ -54,6 +54,7 @@ export function CalendarView({ initialTasks }: Props) {
   const [view, setView] = useState<ViewMode>("month");
   const [cursor, setCursor] = useState<Date>(() => startOfDay(new Date()));
   const [selectedDate, setSelectedDate] = useState<Date>(() => startOfDay(new Date()));
+  const [dayTasksOpen, setDayTasksOpen] = useState(false);
 
   function navigate(delta: number) {
     const next = new Date(cursor);
@@ -63,6 +64,15 @@ export function CalendarView({ initialTasks }: Props) {
       next.setDate(next.getDate() + delta * 7);
     }
     setCursor(next);
+  }
+
+  function handleSelectDate(date: Date) {
+    if (isSameDay(date, selectedDate)) {
+      setDayTasksOpen((o) => !o);
+    } else {
+      setSelectedDate(date);
+      setDayTasksOpen(true);
+    }
   }
 
   const dayTasks = useMemo(
@@ -129,14 +139,14 @@ export function CalendarView({ initialTasks }: Props) {
               monthDate={cursor}
               selectedDate={selectedDate}
               tasks={tasks}
-              onSelectDate={setSelectedDate}
+              onSelectDate={handleSelectDate}
             />
           ) : (
             <WeekGrid
               weekDate={cursor}
               selectedDate={selectedDate}
               tasks={tasks}
-              onSelectDate={setSelectedDate}
+              onSelectDate={handleSelectDate}
             />
           )}
 
@@ -148,10 +158,21 @@ export function CalendarView({ initialTasks }: Props) {
               </div>
             ))}
           </div>
+
+          {/* Mobile accordion — visible only below lg */}
+          <div
+            className={cn(
+              "overflow-hidden transition-all duration-300 lg:hidden",
+              dayTasksOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0",
+            )}
+          >
+            <DayTasks date={selectedDate} tasks={dayTasks} />
+          </div>
         </CardContent>
       </Card>
 
-      <div className="lg:col-span-4">
+      {/* Desktop side panel — visible only at lg+ */}
+      <div className="hidden lg:col-span-4 lg:block">
         <DayTasks date={selectedDate} tasks={dayTasks} />
       </div>
     </div>

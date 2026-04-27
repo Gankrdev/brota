@@ -9,6 +9,7 @@ import { getPlantDetail } from "@/lib/dashboard/queries";
 import { CareGrid } from "@/components/plant/care-grid";
 import { CareHistory } from "@/components/plant/care-history";
 import { WaterNowButton } from "@/components/plant/water-now-button";
+import { DeletePlantButton } from "@/components/plant/delete-plant-button";
 
 const HEALTH_BADGE = {
   healthy: { label: "Saludable", variant: "secondary" as const },
@@ -30,7 +31,7 @@ export default async function PlantDetailPage({
 
   return (
     <main className="pb-32 md:pb-16">
-      <section className="relative h-[400px] w-full bg-muted md:h-[520px]">
+      <section className="relative h-100 w-full bg-muted md:h-130">
         {plant.photoUrl ? (
           <Image
             src={plant.photoUrl}
@@ -39,6 +40,7 @@ export default async function PlantDetailPage({
             sizes="100vw"
             className="object-cover"
             priority
+            loading="eager"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-muted-foreground">
@@ -57,6 +59,11 @@ export default async function PlantDetailPage({
             <ArrowLeft className="size-5" />
           </Link>
         </Button>
+
+        <DeletePlantButton
+          plantId={plant.id}
+          className="absolute top-6 right-6 rounded-full bg-card/80 backdrop-blur-md"
+        />
       </section>
 
       <div className="relative z-10 mx-auto -mt-6 w-full max-w-7xl px-6 md:px-16">

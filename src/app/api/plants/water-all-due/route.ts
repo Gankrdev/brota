@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getPlantsNeedingAttention } from "@/lib/dashboard/queries";
+import { regenerateWateringReminders } from "@/lib/watering";
 
 export async function POST() {
   const session = await auth();
@@ -17,9 +18,9 @@ export async function POST() {
   const occurredAt = new Date();
   const userId = session.user.id;
 
-  const result = await prisma.$transaction(
-    overdue.map((p) =>
-      prisma.careEvent.create({
+  await prisma.$transaction(async (tx) => {
+    for (const p of overdue) {
+      await tx.careEvent.create({
         data: {
           plantId: p.id,
           type: "WATERING",
@@ -27,10 +28,10 @@ export async function POST() {
           amount: "NORMAL",
           registeredBy: userId,
         },
-        select: { id: true },
-      }),
-    ),
-  );
+      });
+      await regenerateWateringReminders(p.id, occurredAt, tx);
+    }
+  });
 
-  return NextResponse.json({ watered: result.length });
+  return NextResponse.json({ watered: overdue.length });
 }
