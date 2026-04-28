@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Pencil, Sprout, StickyNote } from "lucide-react";
+import { ArrowLeft, Microscope, Pencil, Sprout, StickyNote } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,7 @@ const HEALTH_BADGE = {
   healthy: { label: "Saludable", variant: "secondary" as const },
   thirsty: { label: "Sedienta", variant: "default" as const },
   critical: { label: "Crítica", variant: "destructive" as const },
+  pending_diagnosis: { label: "Sin diagnóstico", variant: "outline" as const },
 };
 
 export default async function PlantDetailPage({
@@ -112,6 +113,19 @@ export default async function PlantDetailPage({
                 <Link href={`/jardin/${plant.id}/editar`}>
                   <Pencil className="size-5" />
                   Editar
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="h-11 flex-1 px-6 text-base md:flex-none"
+              >
+                <Link
+                  href={`/diagnostico?plantId=${plant.id}&speciesName=${encodeURIComponent(plant.species.commonName)}`}
+                >
+                  <Microscope className="size-5" />
+                  Diagnosticar
                 </Link>
               </Button>
               <WaterNowButton plantId={plant.id} />

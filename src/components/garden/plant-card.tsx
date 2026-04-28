@@ -15,11 +15,12 @@ const LIGHT_LABEL: Record<LightRequirement, string> = {
 
 const HEALTH_BADGE: Record<
   PlantHealth,
-  { label: string; variant: "secondary" | "default" | "destructive" }
+  { label: string; variant: "secondary" | "default" | "destructive" | "outline" }
 > = {
   healthy: { label: "Saludable", variant: "secondary" },
   thirsty: { label: "Sedienta", variant: "default" },
   critical: { label: "Crítica", variant: "destructive" },
+  pending_diagnosis: { label: "Sin diagnóstico", variant: "secondary" },
 };
 
 function frequencyLabel(days: number): string {

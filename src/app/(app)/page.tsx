@@ -4,6 +4,7 @@ import { greetingFor, attentionSubtitle } from "@/components/dashboard/greeting"
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { NeedsAttention } from "@/components/dashboard/needs-attention";
 import { UpNext } from "@/components/dashboard/up-next";
+import { NotificationToggle } from "@/components/dashboard/notification-toggle";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -21,9 +22,12 @@ export default async function DashboardPage() {
     <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col gap-12 p-6 pb-32 md:flex-row md:p-16 md:pb-16">
       <div className="flex flex-grow flex-col gap-12">
         <section className="flex flex-col gap-2">
-          <h1 className="font-heading text-4xl text-primary md:text-5xl">
-            {greeting}{firstName ? `, ${firstName}` : ""}.
-          </h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-heading text-4xl text-primary md:text-5xl">
+              {greeting}{firstName ? `, ${firstName}` : ""}.
+            </h1>
+            <NotificationToggle />
+          </div>
           <p className="text-lg text-muted-foreground">{subtitle}</p>
         </section>
 

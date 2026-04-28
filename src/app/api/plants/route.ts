@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
       data: {
         nickname: identification.nickname,
         speciesId: species.id,
+        userId: session.user!.id!,
         photoUrl: blob.url,
         location: typeof location === "string" && location ? location : null,
       },

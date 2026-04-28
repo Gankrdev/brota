@@ -80,6 +80,7 @@ model User {
   updatedAt    DateTime @updatedAt
 
   careEvents CareEvent[]
+  plants     Plant[]
 }
 
 model Species {
@@ -124,6 +125,8 @@ model Plant {
   nickname           String
   speciesId          String
   species            Species   @relation(fields: [speciesId], references: [id])
+  userId             String
+  user               User      @relation(fields: [userId], references: [id])
   photoUrl           String?
   location           String?
   customWateringDays Int?
@@ -189,6 +192,17 @@ model Reminder {
 
   @@index([scheduledFor, status])
   @@index([plantId])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 // Phase 2 — sensor support, kept ready but not used in MVP

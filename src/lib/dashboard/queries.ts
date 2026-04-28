@@ -78,7 +78,7 @@ export async function getUpcomingReminders(limitDays = 7): Promise<UpcomingRemin
   }));
 }
 
-export type PlantHealth = "healthy" | "thirsty" | "critical";
+export type PlantHealth = "healthy" | "thirsty" | "critical" | "pending_diagnosis";
 
 export interface CalendarTask {
   id: string;
@@ -140,6 +140,7 @@ export async function getAllPlants(): Promise<GardenPlant[]> {
         take: 1,
         select: { occurredAt: true },
       },
+      diagnoses: { select: { id: true }, take: 1 },
     },
     orderBy: { nickname: "asc" },
   });
@@ -153,7 +154,7 @@ export async function getAllPlants(): Promise<GardenPlant[]> {
     const daysSinceWater = Math.floor((now - lastWatered.getTime()) / MS_PER_DAY);
     const daysOverdue = daysSinceWater - frequency;
 
-    let health: PlantHealth = "healthy";
+    let health: PlantHealth = p.diagnoses.length === 0 ? "pending_diagnosis" : "healthy";
     if (daysOverdue >= 3) health = "critical";
     else if (daysOverdue >= 0) health = "thirsty";
 
@@ -237,7 +238,7 @@ export async function getPlantDetail(id: string): Promise<PlantDetail | null> {
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
   const daysOverdue = Math.floor((Date.now() - lastWatered.getTime()) / MS_PER_DAY) - frequency;
 
-  let health: PlantHealth = "healthy";
+  let health: PlantHealth = plant.diagnoses.length === 0 ? "pending_diagnosis" : "healthy";
   if (daysOverdue >= 3) health = "critical";
   else if (daysOverdue >= 0) health = "thirsty";
 
