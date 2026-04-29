@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DiagnosisUploader } from "@/components/diagnosis/diagnosis-uploader";
 import { DiagnosisResult } from "@/components/diagnosis/diagnosis-result";
 import type { DiagnosisResponse } from "@/app/api/diagnosis/route";
 
-export default function DiagnosticoPage() {
+function DiagnosticoContent() {
   const searchParams = useSearchParams();
   const plantId = searchParams.get("plantId") ?? undefined;
   const speciesName = searchParams.get("speciesName") ?? undefined;
@@ -24,13 +24,19 @@ export default function DiagnosticoPage() {
     setPhotoUrl(null);
   }
 
+  return result && photoUrl ? (
+    <DiagnosisResult result={result} photoUrl={photoUrl} onReset={handleReset} />
+  ) : (
+    <DiagnosisUploader onResult={handleResult} plantId={plantId} speciesName={speciesName} />
+  );
+}
+
+export default function DiagnosticoPage() {
   return (
     <main className="mx-auto w-full max-w-4xl px-6 pb-32 pt-8 md:px-16 md:pb-16">
-      {result && photoUrl ? (
-        <DiagnosisResult result={result} photoUrl={photoUrl} onReset={handleReset} />
-      ) : (
-        <DiagnosisUploader onResult={handleResult} plantId={plantId} speciesName={speciesName} />
-      )}
+      <Suspense>
+        <DiagnosticoContent />
+      </Suspense>
     </main>
   );
 }
