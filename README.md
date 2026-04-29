@@ -3,9 +3,9 @@
 > **Cuida, observa, brota.**
 > Asistente inteligente para el cuidado de plantas del hogar.
 
-Brota es una app personal que ayuda a recordar riegos, llevar fichas por especie, registrar el historial de cuidados y diagnosticar la salud de las plantas mediante IA. Pensada para 2 usuarios (uso doméstico), con dashboard web y experiencia móvil instalable como PWA.
+Brota es una PWA personal que ayuda a recordar riegos, llevar fichas por especie, registrar el historial de cuidados y diagnosticar la salud de las plantas mediante IA. Pensada para uso doméstico (2 usuarios), con dashboard web y experiencia móvil instalable en Android e iPhone.
 
-> Para una visión completa del proyecto, decisiones técnicas y roadmap consulta [`CLAUDE.md`](./CLAUDE.md).
+> Para la visión completa del proyecto, decisiones técnicas y roadmap consulta [`CLAUDE.md`](./CLAUDE.md).
 
 ---
 
@@ -13,27 +13,27 @@ Brota es una app personal que ayuda a recordar riegos, llevar fichas por especie
 
 | Capa | Tecnología |
 |---|---|
-| Framework | [Next.js 16](https://nextjs.org) (App Router, Turbopack) |
+| Framework | [Next.js](https://nextjs.org) (App Router) |
 | Lenguaje | TypeScript estricto |
-| UI | [Tailwind CSS 4](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com) (Radix + Nova) |
-| Tipografía | [Manrope](https://fonts.google.com/specimen/Manrope) (cuerpo) + [Noto Serif](https://fonts.google.com/specimen/Noto+Serif) (titulares) |
-| Iconos | [Lucide](https://lucide.dev) |
+| UI | [Tailwind CSS](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com) |
 | Auth | [NextAuth v5](https://authjs.dev) (CredentialsProvider + JWT) |
 | Validación | [Zod](https://zod.dev) |
-| ORM | [Prisma 7](https://www.prisma.io) (adapter `@prisma/adapter-pg`) |
+| ORM | [Prisma 7](https://www.prisma.io) |
 | Base de datos | [Neon](https://neon.tech) (PostgreSQL serverless) |
-| IA — identificación + ficha | Gemini 2.5 Flash *(pendiente de integrar)* |
-| IA — diagnóstico | Claude Sonnet 4.6 *(pendiente de integrar)* |
-| Almacenamiento de imágenes | [Vercel Blob](https://vercel.com/storage/blob) *(pendiente de integrar)* |
-| Hosting previsto | [Vercel](https://vercel.com) |
+| IA — identificación + ficha | Gemini 2.5 Flash |
+| IA — diagnóstico | Claude Sonnet 4.6 |
+| Almacenamiento de imágenes | [Vercel Blob](https://vercel.com/storage/blob) |
+| Notificaciones | Web Push API (VAPID) |
+| Analíticas | [Vercel Analytics](https://vercel.com/analytics) |
+| Hosting | [Vercel](https://vercel.com) |
 
 ---
 
 ## Requisitos previos
 
-- **Node.js 18+** (probado con Node 24).
-- **Una base de datos PostgreSQL accesible.** Recomendado: cuenta gratuita en [Neon](https://console.neon.tech).
-- Conexión a internet (para Neon, fuentes de Google y futuras llamadas a IA).
+- **Node.js 18+**
+- Cuenta en [Neon](https://console.neon.tech) (PostgreSQL gratuito)
+- API keys de [Anthropic](https://console.anthropic.com) y [Google AI Studio](https://aistudio.google.com)
 
 ---
 
@@ -47,30 +47,29 @@ npm install
 
 ### Variables de entorno
 
-Copia el template y rellena con tus valores:
-
 ```bash
 cp .env.example .env
 ```
 
-Variables mínimas para arrancar la app y autenticarte:
-
-| Variable | De dónde |
+| Variable | Descripción |
 |---|---|
-| `DATABASE_URL` | [Neon dashboard](https://console.neon.tech) → Connection string (pooled) |
+| `DATABASE_URL` | Connection string de Neon |
 | `AUTH_SECRET` | Genera con `npx auth secret` |
-| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_NAME` | Credenciales del usuario administrador |
-| `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` / `SEED_USER_NAME` | Credenciales del segundo usuario |
-
-Las claves de IA (`GOOGLE_GENAI_API_KEY`, `ANTHROPIC_API_KEY`), Vercel Blob y Web Push se cablean en fases posteriores; pueden quedar vacías por ahora.
+| `ANTHROPIC_API_KEY` | API key de Anthropic (Claude) |
+| `GOOGLE_GENAI_API_KEY` | API key de Google AI Studio (Gemini) |
+| `BLOB_READ_WRITE_TOKEN` | Token de Vercel Blob |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Clave pública VAPID para push |
+| `VAPID_PRIVATE_KEY` | Clave privada VAPID |
+| `VAPID_SUBJECT` | Email de contacto (`mailto:...`) |
+| `CRON_SECRET` | Secret para proteger el endpoint de cron |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` / `SEED_ADMIN_NAME` | Usuario administrador |
+| `SEED_USER_EMAIL` / `SEED_USER_PASSWORD` / `SEED_USER_NAME` | Segundo usuario |
 
 ### Base de datos
 
-Aplica el schema y crea las cuentas iniciales:
-
 ```bash
-npm run db:migrate   # crea las tablas en Neon
-npm run db:seed      # inserta los 2 usuarios (idempotente, usa upsert)
+npm run db:migrate   # crea las tablas
+npm run db:seed      # crea los 2 usuarios (idempotente)
 ```
 
 ### Desarrollo
@@ -79,7 +78,7 @@ npm run db:seed      # inserta los 2 usuarios (idempotente, usa upsert)
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). El proxy te redirige a `/login`. Ingresa con cualquiera de las credenciales seedeadas.
+Abre [http://localhost:3000](http://localhost:3000).
 
 ---
 
@@ -87,14 +86,40 @@ Abre [http://localhost:3000](http://localhost:3000). El proxy te redirige a `/lo
 
 | Comando | Descripción |
 |---|---|
-| `npm run dev` | Servidor de desarrollo (Turbopack) |
+| `npm run dev` | Servidor de desarrollo |
 | `npm run build` | Build de producción |
-| `npm run start` | Sirve el build de producción |
 | `npm run lint` | ESLint |
 | `npm run db:generate` | Regenera el cliente Prisma |
-| `npm run db:migrate` | Crea / aplica migraciones (modo dev) |
+| `npm run db:migrate` | Aplica migraciones |
 | `npm run db:studio` | Abre Prisma Studio |
-| `npm run db:seed` | Crea o actualiza los usuarios desde `SEED_*` |
+| `npm run db:seed` | Crea o actualiza los usuarios |
+
+---
+
+## Funcionalidades
+
+### ✅ Implementado
+
+- Autenticación con email + contraseña (NextAuth v5 + bcrypt + JWT)
+- Dashboard con estado de plantas, próximos riegos y acciones rápidas
+- CRUD de plantas con foto
+- Identificación automática de especie al agregar planta (Gemini 2.5 Flash)
+- Ficha de especie generada por IA (luz, agua, temperatura, humedad, cuidados especiales)
+- Registro de riegos con historial
+- Recordatorios de riego con notificaciones push (Web Push API)
+- Diagnóstico de salud por foto con IA (Claude Sonnet 4.6)
+- Historial de cuidados y diagnósticos por planta
+- Vista calendario de cuidados
+- PWA instalable en Android e iPhone (manifest, service worker, íconos, splash screens)
+- Rate limiting en rutas de IA para proteger el saldo de API
+- Cron job horario para enviar recordatorios (Vercel Cron)
+- Analíticas con Vercel Analytics
+
+### 🔜 Próximamente
+
+- Ajuste estacional automático de frecuencia de riego
+- Historial visual con fotos por planta
+- Sensores de humedad ESP32 (Fase 2)
 
 ---
 
@@ -103,70 +128,39 @@ Abre [http://localhost:3000](http://localhost:3000). El proxy te redirige a `/lo
 ```
 src/
 ├── app/
-│   ├── (app)/                 ← rutas autenticadas (layout con TopAppBar + BottomNavBar)
-│   │   ├── layout.tsx
-│   │   └── page.tsx           ← dashboard
-│   ├── api/
-│   │   ├── auth/[...nextauth]/route.ts
-│   │   └── plants/water-all-due/route.ts
-│   ├── login/page.tsx
-│   ├── layout.tsx             ← root: fonts + html lang="es"
-│   └── globals.css            ← tokens del design system
+│   ├── (app)/                 ← rutas autenticadas
+│   ├── api/                   ← route handlers (plants, diagnosis, reminders, push, cron)
+│   ├── login/
+│   └── layout.tsx             ← root: fonts, PWA meta tags, SW register, Analytics
 ├── components/
-│   ├── auth/                  ← LoginForm
-│   ├── dashboard/             ← greeting, quick-actions, needs-attention, up-next
-│   ├── layout/                ← TopAppBar, BottomNavBar, nav-items
-│   └── ui/                    ← shadcn (button, input)
+│   ├── dashboard/
+│   ├── plant/
+│   ├── diagnosis/
+│   ├── calendar/
+│   ├── history/
+│   ├── garden/
+│   ├── layout/
+│   └── ui/                    ← shadcn
 ├── lib/
-│   ├── auth.config.ts         ← config edge-safe (no Prisma)
-│   ├── auth.ts                ← NextAuth completo (Credentials + bcrypt)
-│   ├── db.ts                  ← Prisma singleton (adapter pg)
-│   ├── dashboard/queries.ts   ← lógica de negocio del dashboard
-│   ├── ai/                    ← (vacío) clientes Gemini / Claude
-│   └── validators/            ← (vacío) schemas Zod compartidos
-├── proxy.ts                   ← protección de rutas (Next 16: era middleware.ts)
-├── i18n/es.json               ← strings en español
-├── generated/prisma/          ← cliente Prisma (gitignored)
-└── types/next-auth.d.ts       ← extensión de tipos de Session/JWT
+│   ├── ai/                    ← clientes Claude y Gemini + prompts
+│   ├── auth.ts / auth.config.ts
+│   ├── db.ts
+│   ├── rate-limit.ts          ← rate limiter in-memory por usuario
+│   ├── watering.ts
+│   └── dashboard/queries.ts
+├── hooks/
+│   └── use-push-notifications.ts
+└── types/
 
 prisma/
-├── schema.prisma              ← User, Species, Plant, WateringEvent, Diagnosis, Reminder, SensorReading
+├── schema.prisma
 └── migrations/
 
-scripts/
-└── seed.ts                    ← provisión de usuarios desde env
+public/
+├── manifest.json
+├── sw.js
+└── icons/                     ← íconos PWA + splash screens iOS
 ```
-
-### Decisiones de arquitectura clave
-
-- **Auth split edge/node**. `auth.config.ts` es edge-safe (lo usa `proxy.ts`); `auth.ts` carga Prisma + bcrypt y solo se usa en route handlers / server components. Sin esta separación, el build falla porque Prisma 7 no corre en Edge Runtime.
-- **Sesiones JWT, sin Prisma adapter**. Solo hay 2 usuarios y todo es Credentials, así que no se necesitan tablas `Account`/`Session`/`VerificationToken`.
-- **Sin signup público**. Los usuarios se crean con el script de seed.
-- **Ficha de especie reutilizable**. Una `Species` puede tener N `Plant`. Cada `Plant` puede sobrescribir (`customWateringDays`) sin duplicar la ficha.
-- **Solo modo claro** por ahora. Tokens de tema definidos en `globals.css` (paleta verde bosque + salvia + terracota sobre off-white cálido).
-
----
-
-## Estado del MVP
-
-### ✅ Hecho
-
-- Scaffolding Next.js 16 + Tailwind 4 + shadcn/ui
-- Base de datos en Neon con schema completo y migración inicial
-- Autenticación con email + contraseña (NextAuth v5 + bcrypt + JWT)
-- Pantalla de login (con fondo del invernadero, glassmorphism)
-- Dashboard con saludo dinámico, quick actions, "necesitan atención" y sidebar "próximamente" (todos cableados a DB con empty states)
-- Endpoint `POST /api/plants/water-all-due` (registra riego en lote, con auth)
-- Top bar (desktop) + bottom nav (mobile) según breakpoint
-- Design system aplicado con paleta y tipografías propias
-
-### 🔜 Próximas pantallas
-
-- `/plants/new` — agregar planta con foto e identificación vía Gemini
-- `/plants/[id]` — detalle de planta (historial + ficha + acciones)
-- `/diagnose` — diagnóstico por foto vía Claude
-- Generación automática de recordatorios de riego
-- Configuración PWA (manifest, service worker, push)
 
 ---
 
@@ -176,7 +170,7 @@ scripts/
 - **Commits**: [Conventional Commits](https://www.conventionalcommits.org) (`feat:`, `fix:`, `chore:`, …).
 - **TypeScript estricto**, sin `any` salvo justificación.
 - **Validación con Zod** en todo input externo.
-- **Server components por defecto**; client components solo cuando sea necesario (`useState`, eventos, etc.).
+- **Server components por defecto**; client components solo cuando sea necesario.
 
 ---
 
