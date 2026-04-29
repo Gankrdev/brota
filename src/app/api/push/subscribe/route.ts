@@ -25,6 +25,12 @@ export async function POST(req: NextRequest) {
 
   const { endpoint, keys } = parsed.data;
 
+  // Prevent hijacking another user's push subscription
+  const existing = await prisma.pushSubscription.findUnique({ where: { endpoint }, select: { userId: true } });
+  if (existing && existing.userId !== session.user.id) {
+    return NextResponse.json({ error: "Endpoint no válido." }, { status: 409 });
+  }
+
   await prisma.pushSubscription.upsert({
     where: { endpoint },
     create: {

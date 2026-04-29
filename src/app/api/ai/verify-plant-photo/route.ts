@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { claude, CLAUDE_MODEL } from "@/lib/ai/claude";
+import { auth } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 type AllowedMime = (typeof ALLOWED_TYPES)[number];
@@ -9,6 +11,15 @@ function isAllowedMime(mime: string): mime is AllowedMime {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+  }
+
+  if (!checkRateLimit(`verify-photo:${session.user.id}`, { maxRequests: 10, windowMs: 60 * 60 * 1000 })) {
+    return NextResponse.json({ error: "Demasiadas solicitudes. Intenta más tarde." }, { status: 429 });
+  }
+
   const formData = await req.formData();
   const photo = formData.get("photo");
   const expectedSpecies = formData.get("expectedSpecies");
@@ -18,6 +29,9 @@ export async function POST(req: NextRequest) {
   }
   if (!isAllowedMime(photo.type)) {
     return NextResponse.json({ error: "Formato no soportado." }, { status: 400 });
+  }
+  if (photo.size > 10 * 1024 * 1024) {
+    return NextResponse.json({ error: "La imagen no puede superar 10 MB." }, { status: 400 });
   }
 
   const imageBytes = new Uint8Array(await photo.arrayBuffer());
@@ -53,7 +67,6 @@ export async function POST(req: NextRequest) {
     const { match } = JSON.parse(json);
     return NextResponse.json({ match: Boolean(match) });
   } catch {
-    // If parsing fails, allow the update to proceed
     return NextResponse.json({ match: true });
   }
 }

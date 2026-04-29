@@ -9,8 +9,8 @@ export async function GET(req: Request) {
   }
 
   const url = new URL(req.url);
-  const offset = Number(url.searchParams.get("offset") ?? 0);
-  const limit = Math.min(Number(url.searchParams.get("limit") ?? 20), 50);
+  const offset = Math.max(0, Number(url.searchParams.get("offset") ?? 0));
+  const limit = Math.min(Math.max(1, Number(url.searchParams.get("limit") ?? 20)), 50);
 
   const { entries, hasMore } = await getCareHistory({ offset, limit });
 

@@ -11,9 +11,9 @@ export interface NeedsAttentionPlant {
   expectedFrequencyDays: number;
 }
 
-export async function getPlantsNeedingAttention(): Promise<NeedsAttentionPlant[]> {
+export async function getPlantsNeedingAttention(userId?: string): Promise<NeedsAttentionPlant[]> {
   const plants = await prisma.plant.findMany({
-    where: { deletedAt: null },
+    where: { deletedAt: null, ...(userId ? { userId } : {}) },
     include: {
       species: { select: { commonName: true, wateringFrequencyDays: true } },
       careEvents: {

@@ -10,7 +10,7 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const overdue = await getPlantsNeedingAttention();
+  const overdue = await getPlantsNeedingAttention(session.user.id);
   if (overdue.length === 0) {
     return NextResponse.json({ watered: 0 });
   }

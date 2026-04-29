@@ -13,8 +13,8 @@ export async function POST(
 
   const { id } = await params;
 
-  const reminder = await prisma.reminder.findUnique({
-    where: { id },
+  const reminder = await prisma.reminder.findFirst({
+    where: { id, plant: { userId: session.user.id } },
     select: { id: true, status: true, type: true, plantId: true },
   });
 

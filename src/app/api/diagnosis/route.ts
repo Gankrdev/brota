@@ -4,6 +4,7 @@ import { put } from "@vercel/blob";
 import { claude, CLAUDE_MODEL } from "@/lib/ai/claude";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 type AllowedMime = (typeof ALLOWED_TYPES)[number];
@@ -81,6 +82,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autenticado." }, { status: 401 });
   }
 
+  if (!checkRateLimit(`diagnosis:${session.user.id}`, { maxRequests: 5, windowMs: 60 * 60 * 1000 })) {
+    return NextResponse.json({ error: "Límite de diagnósticos alcanzado. Intenta en una hora." }, { status: 429 });
+  }
+
   const formData = await req.formData();
   const photo = formData.get("photo");
   const speciesName = formData.get("speciesName");
@@ -98,9 +103,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "La imagen no puede superar 10 MB." }, { status: 400 });
   }
 
-  // Validate plantId belongs to a real plant if provided
+  // Validate plantId belongs to the current user
   if (plantId) {
-    const plant = await prisma.plant.findFirst({ where: { id: plantId, deletedAt: null }, select: { id: true } });
+    const plant = await prisma.plant.findFirst({
+      where: { id: plantId, userId: session.user.id, deletedAt: null },
+      select: { id: true },
+    });
     if (!plant) {
       return NextResponse.json({ error: "Planta no encontrada." }, { status: 404 });
     }

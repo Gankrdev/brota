@@ -3,6 +3,7 @@ import { put } from "@vercel/blob";
 import { prisma } from "@/lib/db";
 import { identifyPlant } from "@/lib/ai/identify-plant";
 import { auth } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 type AllowedMime = (typeof ALLOWED_TYPES)[number];
@@ -21,6 +22,10 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "No autenticado." }, { status: 401 });
+  }
+
+  if (!checkRateLimit(`create-plant:${session.user.id}`, { maxRequests: 10, windowMs: 60 * 60 * 1000 })) {
+    return NextResponse.json({ error: "Demasiadas solicitudes. Intenta más tarde." }, { status: 429 });
   }
 
   const formData = await req.formData();
