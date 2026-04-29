@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope, Noto_Serif } from "next/font/google";
 import { ServiceWorkerRegister } from "@/components/shared/service-worker-register";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -108,6 +109,7 @@ export default function RootLayout({
         <ServiceWorkerRegister />
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
