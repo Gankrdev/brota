@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Noto_Serif } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { ServiceWorkerRegister } from "@/components/shared/service-worker-register";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
