@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   }
 
   const now = new Date();
-  const windowEnd = new Date(now.getTime() + 60 * 60 * 1000); // next hour
+  const windowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000); // next 24 hours
 
   const reminders = await prisma.reminder.findMany({
     where: {
