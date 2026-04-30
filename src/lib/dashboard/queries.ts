@@ -11,9 +11,9 @@ export interface NeedsAttentionPlant {
   expectedFrequencyDays: number;
 }
 
-export async function getPlantsNeedingAttention(userId?: string): Promise<NeedsAttentionPlant[]> {
+export async function getPlantsNeedingAttention(userId: string): Promise<NeedsAttentionPlant[]> {
   const plants = await prisma.plant.findMany({
-    where: { deletedAt: null, ...(userId ? { userId } : {}) },
+    where: { deletedAt: null, userId },
     include: {
       species: { select: { commonName: true, wateringFrequencyDays: true } },
       careEvents: {
@@ -57,13 +57,14 @@ export interface UpcomingReminder {
   scheduledFor: Date;
 }
 
-export async function getUpcomingReminders(limitDays = 7): Promise<UpcomingReminder[]> {
+export async function getUpcomingReminders(userId: string, limitDays = 7): Promise<UpcomingReminder[]> {
   const horizon = new Date(Date.now() + limitDays * 24 * 60 * 60 * 1000);
 
   const reminders = await prisma.reminder.findMany({
     where: {
       status: "PENDING",
       scheduledFor: { lte: horizon },
+      plant: { userId, deletedAt: null },
     },
     include: { plant: { select: { nickname: true } } },
     orderBy: { scheduledFor: "asc" },
@@ -90,10 +91,11 @@ export interface CalendarTask {
   status: "PENDING" | "SENT" | "ACKNOWLEDGED" | "DISMISSED";
 }
 
-export async function getCalendarTasks(from: Date, to: Date): Promise<CalendarTask[]> {
+export async function getCalendarTasks(userId: string, from: Date, to: Date): Promise<CalendarTask[]> {
   const reminders = await prisma.reminder.findMany({
     where: {
       scheduledFor: { gte: from, lte: to },
+      plant: { userId, deletedAt: null },
     },
     include: {
       plant: { select: { id: true, nickname: true, location: true } },
@@ -123,9 +125,9 @@ export interface GardenPlant {
   health: PlantHealth;
 }
 
-export async function getAllPlants(): Promise<GardenPlant[]> {
+export async function getAllPlants(userId: string): Promise<GardenPlant[]> {
   const plants = await prisma.plant.findMany({
-    where: { deletedAt: null },
+    where: { deletedAt: null, userId },
     include: {
       species: {
         select: {
@@ -213,9 +215,9 @@ export type PlantHistoryEvent =
       healthStatus: "HEALTHY" | "ATTENTION" | "CRITICAL";
     };
 
-export async function getPlantDetail(id: string): Promise<PlantDetail | null> {
+export async function getPlantDetail(id: string, userId: string): Promise<PlantDetail | null> {
   const plant = await prisma.plant.findFirst({
-    where: { id, deletedAt: null },
+    where: { id, deletedAt: null, userId },
     include: {
       species: true,
       careEvents: {
@@ -292,6 +294,7 @@ export async function getPlantDetail(id: string): Promise<PlantDetail | null> {
 // ---------- Care history (timeline page) ----------
 
 export interface HistoryFilters {
+  userId: string;
   plantId?: string;
   types?: CareType[];
   limit?: number;
@@ -309,16 +312,17 @@ export interface HistoryEntry {
 }
 
 export async function getCareHistory({
+  userId,
   plantId,
   types,
   limit = 20,
   offset = 0,
-}: HistoryFilters = {}): Promise<{ entries: HistoryEntry[]; hasMore: boolean }> {
+}: HistoryFilters): Promise<{ entries: HistoryEntry[]; hasMore: boolean }> {
   const events = await prisma.careEvent.findMany({
     where: {
       ...(plantId ? { plantId } : {}),
       ...(types && types.length > 0 ? { type: { in: types } } : {}),
-      plant: { deletedAt: null },
+      plant: { deletedAt: null, userId },
     },
     include: {
       plant: { select: { id: true, nickname: true } },
@@ -345,11 +349,11 @@ export async function getCareHistory({
   };
 }
 
-export async function getCareEventCountSince(since: Date): Promise<number> {
+export async function getCareEventCountSince(userId: string, since: Date): Promise<number> {
   return prisma.careEvent.count({
     where: {
       occurredAt: { gte: since },
-      plant: { deletedAt: null },
+      plant: { deletedAt: null, userId },
     },
   });
 }
@@ -359,9 +363,9 @@ export interface PlantOption {
   nickname: string;
 }
 
-export async function getPlantOptions(): Promise<PlantOption[]> {
+export async function getPlantOptions(userId: string): Promise<PlantOption[]> {
   const plants = await prisma.plant.findMany({
-    where: { deletedAt: null },
+    where: { deletedAt: null, userId },
     select: { id: true, nickname: true },
     orderBy: { nickname: "asc" },
   });

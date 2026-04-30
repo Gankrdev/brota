@@ -8,11 +8,15 @@ import { NotificationToggle } from "@/components/dashboard/notification-toggle";
 
 export default async function DashboardPage() {
   const session = await auth();
-  const firstName = session?.user?.name?.split(" ")[0] ?? "";
+  if (!session?.user?.id) {
+    throw new Error("Unauthenticated");
+  }
+  const userId = session.user.id;
+  const firstName = session.user.name?.split(" ")[0] ?? "";
 
   const [needsAttention, reminders] = await Promise.all([
-    getPlantsNeedingAttention(),
-    getUpcomingReminders(),
+    getPlantsNeedingAttention(userId),
+    getUpcomingReminders(userId),
   ]);
 
   const greeting = greetingFor(new Date());

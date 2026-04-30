@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { getPlantDetail } from "@/lib/dashboard/queries";
 import { EditPlantForm } from "@/components/plant/edit-plant-form";
 
@@ -7,8 +8,12 @@ export default async function EditarPlantaPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthenticated");
+  }
   const { id } = await params;
-  const plant = await getPlantDetail(id);
+  const plant = await getPlantDetail(id, session.user.id);
 
   if (!plant) notFound();
 

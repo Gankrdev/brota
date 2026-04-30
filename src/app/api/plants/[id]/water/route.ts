@@ -15,7 +15,7 @@ export async function POST(
   const { id } = await params;
 
   const plant = await prisma.plant.findFirst({
-    where: { id, deletedAt: null },
+    where: { id, deletedAt: null, userId: session.user.id },
     select: { id: true },
   });
 

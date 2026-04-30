@@ -1,12 +1,17 @@
+import { auth } from "@/lib/auth";
 import { getCalendarTasks } from "@/lib/dashboard/queries";
 import { CalendarView } from "@/components/calendar/calendar-view";
 
 export default async function CalendarioPage() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthenticated");
+  }
   const now = new Date();
   const from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const to = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
 
-  const tasks = await getCalendarTasks(from, to);
+  const tasks = await getCalendarTasks(session.user.id, from, to);
   const serialized = tasks.map((t) => ({
     ...t,
     scheduledFor: t.scheduledFor.toISOString(),

@@ -1,8 +1,13 @@
+import { auth } from "@/lib/auth";
 import { getAllPlants } from "@/lib/dashboard/queries";
 import { GardenExplorer } from "@/components/garden/garden-explorer";
 
 export default async function JardinPage() {
-  const plants = await getAllPlants();
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthenticated");
+  }
+  const plants = await getAllPlants(session.user.id);
 
   return (
     <main className="mx-auto w-full max-w-7xl flex-grow px-6 pb-32 pt-20 md:px-16 md:pb-16">

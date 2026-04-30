@@ -5,6 +5,7 @@ import { ArrowLeft, Microscope, Pencil, Sprout, StickyNote } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { auth } from "@/lib/auth";
 import { getPlantDetail } from "@/lib/dashboard/queries";
 import { CareGrid } from "@/components/plant/care-grid";
 import { CareHistory } from "@/components/plant/care-history";
@@ -23,8 +24,12 @@ export default async function PlantDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthenticated");
+  }
   const { id } = await params;
-  const plant = await getPlantDetail(id);
+  const plant = await getPlantDetail(id, session.user.id);
 
   if (!plant) notFound();
 

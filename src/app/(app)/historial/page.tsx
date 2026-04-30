@@ -1,5 +1,6 @@
 import { Leaf } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { auth } from "@/lib/auth";
 import {
   getCareEventCountSince,
   getCareHistory,
@@ -10,14 +11,20 @@ import { HistoryExplorer } from "@/components/history/history-explorer";
 const PAGE_SIZE = 20;
 
 export default async function HistorialPage() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthenticated");
+  }
+  const userId = session.user.id;
+
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
   const [{ entries, hasMore }, plants, monthCount] = await Promise.all([
-    getCareHistory({ limit: PAGE_SIZE }),
-    getPlantOptions(),
-    getCareEventCountSince(startOfMonth),
+    getCareHistory({ userId, limit: PAGE_SIZE }),
+    getPlantOptions(userId),
+    getCareEventCountSince(userId, startOfMonth),
   ]);
 
   const serialized = entries.map((e) => ({
