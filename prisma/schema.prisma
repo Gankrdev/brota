@@ -74,6 +74,7 @@ model User {
   id           String   @id @default(cuid())
   email        String   @unique
   name         String?
+  bio          String?
   passwordHash String
   role         UserRole @default(USER)
   createdAt    DateTime @default(now())

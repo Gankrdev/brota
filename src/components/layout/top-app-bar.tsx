@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, CircleUser } from "lucide-react";
+import { Bell } from "lucide-react";
 import { NAV_ITEMS } from "@/components/layout/nav-items";
+import { InitialAvatar } from "@/components/profile/initial-avatar";
 import { cn } from "@/lib/utils";
 
-export function TopAppBar() {
+interface TopAppBarProps {
+  userName: string | null;
+  userEmail: string;
+}
+
+export function TopAppBar({ userName, userEmail }: TopAppBarProps) {
   const pathname = usePathname();
 
   return (
@@ -46,13 +52,17 @@ export function TopAppBar() {
         >
           <Bell className="size-6" />
         </button>
-        <button
-          type="button"
+        <Link
+          href="/perfil"
           aria-label="Perfil"
-          className="text-primary transition-opacity hover:opacity-80 active:opacity-70"
+          className="rounded-full transition-opacity hover:opacity-80 active:opacity-70"
         >
-          <CircleUser className="size-6" />
-        </button>
+          <InitialAvatar
+            name={userName}
+            email={userEmail}
+            className="size-9"
+          />
+        </Link>
       </div>
     </header>
   );
